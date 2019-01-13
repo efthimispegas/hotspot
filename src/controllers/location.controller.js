@@ -1,4 +1,4 @@
-import { _Location } from '../models';
+import { _Location, Hotspot } from '../models';
 
 /**
  * Controller for the creation of a location
@@ -47,7 +47,7 @@ export const createLocation = async (req, res) => {
       .status(201)
       .json({ error: false, location: await newLocation.save() });
   } catch (e) {
-    return res.status(400).json({
+    return res.status(e.status).json({
       error: true,
       message: 'Error with creating location!',
       details: e
@@ -81,6 +81,23 @@ export const getAllLocations = async (req, res) => {
 export const getLocation = async (req, res) => {
   const { title, description } = req.body;
   const { locationId } = req.params;
+
+  if (!locationId) {
+    res.status(400).json({
+      error: true,
+      message: 'You need to provide a location id!',
+      details: e
+    });
+  }
+
+  const location = await _Location.findById(locationId);
+
+  if (!location) {
+    return res.status(400).json({
+      error: true,
+      message: 'Location not found!'
+    });
+  }
 
   try {
     //return 200 for success
@@ -158,6 +175,47 @@ export const createLocationHotspot = async (req, res) => {
     return res.status(400).json({
       error: true,
       message: 'Error with creating hotspot!',
+      details: e
+    });
+  }
+};
+
+/**
+ * Controller for getting all the hotspots of
+ * this particular location
+ */
+
+export const getLocationHotspots = async (req, res) => {
+  const { locationId } = req.params;
+
+  if (!locationId) {
+    return res.status(400).json({
+      error: true,
+      message: 'You need to provide a location id!'
+    });
+  }
+
+  const location = await _Location.findById(locationId);
+
+  if (!location) {
+    return res.status(400).json({
+      error: true,
+      message: 'Location not found'
+    });
+  }
+
+  try {
+    return res.status(200).json({
+      error: false,
+      hotspots: await Hotspot.find({ location: locationId }).populate(
+        'location',
+        'name'
+      )
+    });
+  } catch (e) {
+    return res.status(e.status).json({
+      error: true,
+      message: "Error with getting location's hotspots",
       details: e
     });
   }

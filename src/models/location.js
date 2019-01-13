@@ -30,18 +30,18 @@ const _Location = new Schema(
   }
 );
 
+/**
+ * Create a hotspot and add it to the particular
+ * location's array of hotspots
+ */
+
 _Location.statics.addHotspot = async function(id, args) {
   const Hotspot = mongoose.model('Hotspot');
-  let location = await this.findById(id);
-  // console.log(`Location before the hew hotspot's addition:\n ${location}\n`);
-  // console.log('==============\n');
-
+  //craete a new hotspot with a property of key "locations" and a value of the location's id
   const newHotspot = new Hotspot({ ...args, location: id });
-  // console.log(`The new hotspot to add:\n ${newHotspot}\n`);
-  // console.log('==============\n');
-
+  //find the location by id and update its hotspots property
   await this.findByIdAndUpdate(id, { $push: { hotspots: newHotspot.id } });
-
+  //finally we save the newly created hotspot and return it
   return {
     hotspot: await newHotspot.save()
   };
