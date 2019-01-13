@@ -1,2 +1,2 @@
 # hotspot
-A review/rating for social places/clubs app
+An app for finding and rating your town's hot places on map 
