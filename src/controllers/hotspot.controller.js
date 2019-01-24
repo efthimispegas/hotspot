@@ -1,5 +1,4 @@
 import Hotspot from '../models/hotspot';
-import { Schema } from 'mongoose';
 
 export const createHotspot = async (req, res) => {
   const { title, description } = req.body;
