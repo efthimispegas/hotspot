@@ -165,8 +165,6 @@ export const createLocationHotspot = async (req, res) => {
       title,
       description
     });
-    console.log(hotspot);
-
     return res.status(201).json({
       error: false,
       hotspot
