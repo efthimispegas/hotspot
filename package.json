@@ -1,0 +1,26 @@
+{
+  "name": "hotspot-server",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": {},
+  "author": "Efthimis Pegas",
+  "license": "MIT",
+  "scripts": {
+    "devserver": "nodemon dist/index.js",
+    "build:watch": "babel -w --out-dir=dist ./src",
+    "clean": "rimraf dist"
+  },
+  "dependencies": {
+    "babel-plugin-transform-object-rest-spread": "^6.26.0",
+    "babel-preset-env": "^1.7.0",
+    "body-parser": "^1.18.3",
+    "express": "^4.16.4",
+    "jsonwebtoken": "^8.4.0",
+    "mongoose": "4.7.7",
+    "morgan": "^1.9.1",
+    "nodemon": "^1.18.9",
+    "passport": "^0.4.0",
+    "passport-jwt": "^4.0.0",
+    "rimraf": "^2.6.3"
+  }
+}
