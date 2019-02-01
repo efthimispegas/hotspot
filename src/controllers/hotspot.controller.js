@@ -1,10 +1,13 @@
 import Hotspot from '../models/hotspot';
+import { querySetup } from '../helpers/query.helpers';
+import { checkInput } from '../helpers/hotspot.helpers';
 
 export const createHotspot = async (req, res) => {
   console.log('===============');
   console.log('[HotspotController]\n:', req.body);
   console.log('===============');
   try {
+    const q = checkInput(req);
     const {
       text,
       loc: { lng, lat },
@@ -16,8 +19,8 @@ export const createHotspot = async (req, res) => {
     } = req.body;
     const newHotspot = new Hotspot({
       text,
-      description: text.substr(0, 150),
-      loc: { lng, lat },
+      description: q.description,
+      loc: { lng: q.lng, lat: q.lat },
       city,
       country,
       validity,
@@ -25,7 +28,8 @@ export const createHotspot = async (req, res) => {
         id,
         username
       },
-      file
+      file,
+      created_at: Date.now()
     });
 
     await newHotspot.save(err => {
@@ -38,7 +42,11 @@ export const createHotspot = async (req, res) => {
       }
     });
     //return 201 for creation
-    return res.status(201).json({ hotspot: newHotspot });
+    return res.status(201).json({
+      sucess: true,
+      message: `New hotspot with id - ${hotspotId} created successfully!`,
+      hotspot: newHotspot
+    });
   } catch (e) {
     return res.status(e.status).json({
       error: true,
@@ -60,23 +68,32 @@ export const getHotspot = async (req, res) => {
   } catch (e) {
     return res.status(e.status).json({
       error: true,
-      message: 'Error with getting all hotspots!',
+      message: `Error with getting hotspot! Check whether the provided hotspot ID is valid.`,
       details: e
     });
   }
 };
 
 export const getAllHotspots = async (req, res) => {
-  const { title, description } = req.body;
+  const q = querySetup(req);
+  const query = { parent: null };
+  const options = {
+    limit: q.limit,
+    offset: q.offset,
+    select: 'description loc'
+  };
 
-  try {
-    //return 200 for success
-    return res.status(200).json({ hotspots: await Hotspot.find() });
-  } catch (e) {
-    return res.status(e.status).json({
-      error: true,
-      message: 'Error with getting all hotspots!',
-      details: e
+  const result = await Hotspot.paginate(query, options);
+  if (result) {
+    return res.status(200).json({
+      error: false,
+      message: `Successfull pagination. Fetched ${result.total} hotspots`,
+      hotspots: result
     });
   }
+  return res.status(400).json({
+    success: false,
+    message:
+      'Error with hotspots pagination method. Check whether the collection is empty'
+  });
 };
