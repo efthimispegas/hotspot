@@ -14,3 +14,5 @@ CommentRoutes.get(`${base}/comments`, CommentController.getAllComments);
 
 /* POST a Comment on a hotspot */
 CommentRoutes.post(`${base}/comments/new`, CommentController.createComment);
+
+export default CommentRoutes;

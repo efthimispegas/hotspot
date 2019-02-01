@@ -1,19 +1,21 @@
-import { _Comment, Hotspot } from '../models';
+import { _Comment } from '../models';
 import { querySetup } from '../helpers/query.helpers';
 import { checkInput } from '../helpers/hotspot.helpers';
 
+/* [Working as expected] */
 export const getAllComments = async (req, res) => {
   const { hotspotId } = req.params;
+  const q = querySetup(req);
   try {
-    const q = querySetup(req.query);
-    const query = {
+    const query = { parent: hotspotId };
+    const options = {
       limit: q.limit,
       offset: q.offset,
       sort: { published_at: 1 },
       select: 'description published_at user'
     };
 
-    const result = await Hotspot.paginate(query, options);
+    const result = await _Comment.paginate(query, options);
     if (result) {
       return res.status(200).json({
         error: false,
@@ -30,14 +32,17 @@ export const getAllComments = async (req, res) => {
     return res.status(400).json({
       error: true,
       message: `Error when fetching comments from hotspot with id - ${hotspotId}`,
-      details: e
+      details: e.message
     });
   }
 };
 
+/* [Working as expected] */
 export const createComment = async (req, res) => {
   const { hotspotId } = req.params;
-
+  console.log('===============');
+  console.log('[CommentController] :\n');
+  console.log('===============');
   try {
     //try find a hotspot with the requested id
     const foundHotspot = await Hotspot.findById(hotspotId);
@@ -61,19 +66,15 @@ export const createComment = async (req, res) => {
         console.log(err);
         return res.status(400).json({
           success: false,
-          message: `Coudn't save comment on hotspot with id - ${hotspotId} from user with id ${
-            req.user.id
-          }`,
+          message: `Coudn't save comment!`,
           details: err
         });
       }
       //return 201 for creation
       return res.status(201).json({
         sucess: true,
-        message: `New comment on hotspot with id - ${hotspotId} created successfully from the user with id ${
-          req.user.id
-        }!`,
-        hotspot: newHotspot
+        message: `New comment on hotspot with id - ${hotspotId} created successfully!`,
+        comment: newComment
       });
     });
   } catch (e) {

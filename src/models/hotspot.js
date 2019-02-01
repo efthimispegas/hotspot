@@ -6,8 +6,8 @@ const Hotspot = new Schema(
     text: { type: String, required: true },
     description: { type: String, required: true },
     loc: {
-      lng: { type: Number },
-      lat: { type: Number }
+      lat: { type: Number },
+      lng: { type: Number }
     },
     city: { type: String },
     country: { type: String },

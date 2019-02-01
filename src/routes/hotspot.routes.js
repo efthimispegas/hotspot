@@ -2,7 +2,6 @@ import { Router } from 'express';
 
 import { HotspotController } from '../controllers';
 import { querySetup } from '../helpers/query.helpers';
-import { Hotspot } from '../models';
 
 const HotspotRoutes = new Router();
 
@@ -11,12 +10,8 @@ const HotspotRoutes = new Router();
 /* GET Hotspots */
 HotspotRoutes.get('/hotspots', HotspotController.getAllHotspots);
 
-/* GET Hotspot by id
-HotspotRoutes.get(
-  '/hotspots/:hotspotId',
-  // requireJwtAuth,
-  HotspotController.getHotspot
-);
+/* GET Hotspot by id */
+HotspotRoutes.get('/hotspots/:hotspotId', HotspotController.getHotspot);
 
 //============= POST ===============//
 

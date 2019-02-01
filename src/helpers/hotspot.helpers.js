@@ -6,7 +6,7 @@ export const checkInput = req => {
     lng = loc.lng;
   }
   if (text) {
-    description = text.substr(0, 150);
+    description = text.substr(0, 150).concat('...');
   }
 
   return { lat, lng, description };

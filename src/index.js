@@ -5,7 +5,8 @@ import {
   DefaultRoutes,
   HotspotRoutes,
   LocationRoutes,
-  UserRoutes
+  UserRoutes,
+  CommentRoutes
 } from './routes';
 import path from 'path';
 
@@ -21,7 +22,13 @@ dbConfig();
  */
 middlewareConfig(app);
 
-app.use('/api', [DefaultRoutes, HotspotRoutes, LocationRoutes, UserRoutes]);
+app.use('/api', [
+  DefaultRoutes,
+  HotspotRoutes,
+  LocationRoutes,
+  UserRoutes,
+  CommentRoutes
+]);
 
 /**
  * Listening on PORT
