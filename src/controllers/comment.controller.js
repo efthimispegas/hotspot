@@ -1,48 +1,52 @@
-import { _Comment } from '../models';
+import { _Comment, Hotspot } from '../models';
 import { querySetup } from '../helpers/query.helpers';
 import { checkInput } from '../helpers/hotspot.helpers';
 
-/* [Working as expected] */
-export const getAllComments = async (req, res) => {
+export const getHotspotComments = async (req, res) => {
   const { hotspotId } = req.params;
-  const q = querySetup(req);
   try {
+    //Try to find to hotspot specified by the hotspotId
+    const foundHotspot = await Hotspot.findById(hotspotId);
+    console.log('===============');
+    console.log('[CommentController]:\n', foundHotspot);
+    console.log('===============');
+    //If the hotspot doesn't exist, handle it
+    if (!foundHotspot) {
+      return res.status(400).json({
+        success: false,
+        message:
+          'Error with comments pagination method. Check whether the collection is empty'
+      });
+    }
+    const q = querySetup(req);
     const query = { parent: hotspotId };
     const options = {
       limit: q.limit,
       offset: q.offset,
-      sort: { published_at: 1 },
-      select: 'description published_at user'
+      select: 'description created_at user',
+      sort: { create_at: -1 }
     };
-
-    const result = await _Comment.paginate(query, options);
-    if (result) {
-      return res.status(200).json({
-        error: false,
-        message: `Successfull pagination. Fetched ${result.total} comments`,
-        comments: result
-      });
-    }
-    return res.status(400).json({
-      success: false,
-      message:
-        'Error with comments pagination method. Check whether the collection is empty'
+    //Execute a query on the comments collection and
+    //paginate the returned docs with the options above
+    const docs = await _Comment.paginate(query, options);
+    return res.status(200).json({
+      error: false,
+      message: `Successfull pagination. Fetched ${docs.total} comments`,
+      hotspot: foundHotspot._id,
+      comments: docs
     });
   } catch (e) {
     return res.status(400).json({
       error: true,
       message: `Error when fetching comments from hotspot with id - ${hotspotId}`,
-      details: e.message
+      details: e
     });
   }
 };
 
-/* [Working as expected] */
 export const createComment = async (req, res) => {
   const { hotspotId } = req.params;
-  console.log('===============');
-  console.log('[CommentController] :\n');
-  console.log('===============');
+
   try {
     //try find a hotspot with the requested id
     const foundHotspot = await Hotspot.findById(hotspotId);
@@ -66,7 +70,7 @@ export const createComment = async (req, res) => {
         console.log(err);
         return res.status(400).json({
           success: false,
-          message: `Coudn't save comment!`,
+          message: `Coudn't save comment on hotspot with id - ${hotspotId}`,
           details: err
         });
       }

@@ -8,7 +8,7 @@ const base = '/hotspots/:hotspotId';
 //============ GET ================/
 
 /* GET Hotspot's comments */
-CommentRoutes.get(`${base}/comments`, CommentController.getAllComments);
+CommentRoutes.get(`${base}/comments`, CommentController.getHotspotComments);
 
 //============== POST =================/
 
