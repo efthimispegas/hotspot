@@ -8,7 +8,8 @@
   "scripts": {
     "devserver": "nodemon dist/index.js",
     "build:watch": "babel -w --out-dir=dist ./src",
-    "clean": "rimraf dist"
+    "clean": "rimraf dist",
+    "clean-modules": "rimraf node_modules"
   },
   "dependencies": {
     "async": "^2.6.1",
