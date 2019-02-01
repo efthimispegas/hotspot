@@ -1,7 +1,13 @@
 import express from 'express';
 import dbConfig from './config/db';
 import middlewareConfig from './config/middleware';
-import { HotspotRoutes, LocationRoutes, UserRoutes } from './routes';
+import {
+  DefaultRoutes,
+  HotspotRoutes,
+  LocationRoutes,
+  UserRoutes
+} from './routes';
+import path from 'path';
 
 const app = express();
 
@@ -15,7 +21,7 @@ dbConfig();
  */
 middlewareConfig(app);
 
-app.use('/api', [HotspotRoutes, LocationRoutes, UserRoutes]);
+app.use('/api', [DefaultRoutes, HotspotRoutes, LocationRoutes, UserRoutes]);
 
 /**
  * Listening on PORT
@@ -26,6 +32,7 @@ app.listen(PORT, err => {
   if (err) {
     console.log(err);
   } else {
-    console.log(`App listening to port: ${PORT}`);
+    console.log(`Server is listening on port: ${PORT}`);
+    console.log(`Current enviroment is set to: ${process.env.NODE_ENV}`);
   }
 });

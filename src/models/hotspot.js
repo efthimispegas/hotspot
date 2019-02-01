@@ -1,29 +1,30 @@
 import mongoose, { Schema } from 'mongoose';
+import mongoosePaginate from 'mongoose-paginate';
 
 const Hotspot = new Schema(
   {
-    title: {
-      type: String,
-      required: true
+    text: { type: String, required: true },
+    description: { type: String, required: true },
+    loc: {
+      lng: { type: Number },
+      lat: { type: Number }
     },
-    description: {
-      type: String,
-      required: true
+    city: { type: String },
+    country: { type: String },
+    validity: { type: Number },
+    valid: { type: Boolean, default: true },
+    file: { type: Object },
+    views_count: { type: Number },
+    comments_count: { type: Number },
+    user: {
+      id: { type: String },
+      username: { type: String }
     },
-    hotspotDate: {
-      type: Date
-    },
-    location: {
-      type: Schema.Types.ObjectId,
-      ref: '_Location'
-    }
+    created_at: { type: Date }
   },
-  {
-    timestamps: true
-  },
-  {
-    usePushEach: true
-  }
+  { collection: 'hotspots' }
 );
+
+Hotspot.plugin(mongoosePaginate);
 
 export default mongoose.model('Hotspot', Hotspot);

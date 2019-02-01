@@ -8,28 +8,33 @@ var _mongoose = require('mongoose');
 
 var _mongoose2 = _interopRequireDefault(_mongoose);
 
+var _mongoosePaginate = require('mongoose-paginate');
+
+var _mongoosePaginate2 = _interopRequireDefault(_mongoosePaginate);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 const Hotspot = new _mongoose.Schema({
-  title: {
-    type: String,
-    required: true
+  text: { type: String, required: true },
+  description: { type: String, required: true },
+  loc: {
+    lng: { type: Number },
+    lat: { type: Number }
   },
-  description: {
-    type: String,
-    required: true
+  city: { type: String },
+  country: { type: String },
+  validity: { type: Number },
+  valid: { type: Boolean, default: true },
+  file: { type: Object },
+  views_count: { type: Number },
+  comments_count: { type: Number },
+  user: {
+    id: { type: String },
+    username: { type: String }
   },
-  hotspotDate: {
-    type: Date
-  },
-  location: {
-    type: _mongoose.Schema.Types.ObjectId,
-    ref: '_Location'
-  }
-}, {
-  timestamps: true
-}, {
-  usePushEach: true
-});
+  created_at: { type: Date }
+}, { collection: 'hotspots' });
+
+Hotspot.plugin(_mongoosePaginate2.default);
 
 exports.default = _mongoose2.default.model('Hotspot', Hotspot);
