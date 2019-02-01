@@ -1,44 +1,44 @@
 import Hotspot from '../models/hotspot';
 
 export const createHotspot = async (req, res) => {
-  const { title, description } = req.body;
-  const newHotspot = new Hotspot({ title, description });
-
-  /**
-   * Validation checks
-   */
-  if (!title) {
-    return res
-      .status(400)
-      .json({ error: true, message: 'A title is required!' });
-  } else if (typeof title !== 'string') {
-    return res
-      .status(400)
-      .json({ error: true, message: 'The title must be a string!' });
-  } else if (title.length < 3) {
-    return res.status(400).json({
-      error: true,
-      message: 'Who are you kidding?! No title is that short...'
-    });
-  }
-
-  if (!description) {
-    return res
-      .status(400)
-      .json({ error: true, message: 'A description is required!' });
-  } else if (typeof description !== 'string') {
-    return res
-      .status(400)
-      .json({ error: true, message: 'The description must be a string!' });
-  } else if (description.length < 10) {
-    return res
-      .status(400)
-      .json({ error: true, message: 'Please be a little more informative..' });
-  }
-
+  console.log('===============');
+  console.log('[HotspotController]\n:', req.body);
+  console.log('===============');
   try {
+    const {
+      text,
+      loc: { lng, lat },
+      city,
+      country,
+      validity,
+      user: { id, username },
+      file
+    } = req.body;
+    const newHotspot = new Hotspot({
+      text,
+      description: text.substr(0, 150),
+      loc: { lng, lat },
+      city,
+      country,
+      validity,
+      user: {
+        id,
+        username
+      },
+      file
+    });
+
+    await newHotspot.save(err => {
+      if (err) {
+        return res.status(400).json({
+          error: true,
+          message: err.message,
+          details: err
+        });
+      }
+    });
     //return 201 for creation
-    return res.status(201).json({ hotspot: await newHotspot.save() });
+    return res.status(201).json({ hotspot: newHotspot });
   } catch (e) {
     return res.status(e.status).json({
       error: true,

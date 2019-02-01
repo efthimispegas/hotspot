@@ -14,6 +14,10 @@ var _middleware2 = _interopRequireDefault(_middleware);
 
 var _routes = require('./routes');
 
+var _path = require('path');
+
+var _path2 = _interopRequireDefault(_path);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 const app = (0, _express2.default)();
@@ -28,7 +32,7 @@ const app = (0, _express2.default)();
  */
 (0, _middleware2.default)(app);
 
-app.use('/api', [_routes.HotspotRoutes, _routes.LocationRoutes, _routes.UserRoutes]);
+app.use('/api', [_routes.DefaultRoutes, _routes.HotspotRoutes, _routes.LocationRoutes, _routes.UserRoutes]);
 
 /**
  * Listening on PORT
@@ -39,6 +43,7 @@ app.listen(PORT, err => {
   if (err) {
     console.log(err);
   } else {
-    console.log(`App listening to port: ${PORT}`);
+    console.log(`Server is listening on port: ${PORT}`);
+    console.log(`Current enviroment is set to: ${process.env.NODE_ENV}`);
   }
 });

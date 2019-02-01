@@ -3,7 +3,9 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.UserRoutes = exports.LocationRoutes = exports.HotspotRoutes = undefined;
+exports.UserRoutes = exports.LocationRoutes = exports.HotspotRoutes = exports.DefaultRoutes = undefined;
+
+var _express = require('express');
 
 var _hotspot = require('./hotspot.routes');
 
@@ -19,6 +21,13 @@ var _user2 = _interopRequireDefault(_user);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+/* GET home page. */
+const DefaultRoutes = new _express.Router();
+DefaultRoutes.get('/', function (req, res, next) {
+  res.render('index', { title: 'Express' });
+});
+
+exports.DefaultRoutes = DefaultRoutes;
 exports.HotspotRoutes = _hotspot2.default;
 exports.LocationRoutes = _location2.default;
 exports.UserRoutes = _user2.default;
