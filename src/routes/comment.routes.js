@@ -3,12 +3,12 @@ import { Router } from 'express';
 import { CommentController } from '../controllers';
 
 const CommentRoutes = new Router();
-const base = '/hotspots/:hotspotId';
+const base = '/:userId/hotspots/:hotspotId';
 
 //============ GET ================/
 
-/* GET Hotspot's comments */
-CommentRoutes.get(`${base}/comments`, CommentController.getHotspotComments);
+/* GET Hotspot's comments -> will ultimately be the route for the message details page (comments, views etc) */
+CommentRoutes.get(`${base}/comments`, CommentController._getHotspotComments);
 
 //============== POST =================/
 

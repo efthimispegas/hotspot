@@ -26,21 +26,53 @@ export const getUser = async (req, res) => {
   }
 };
 
-export const createUser = async (req, res) => {
+export const signup = async (req, res) => {
   const { email, password, username } = req.body;
 
   try {
+    //check if the user already exists
+    const foundUser = await User.findOne({ email });
+    if (foundUser) {
+      return res.status(403).json({
+        error: true,
+        message: 'Email is already in use'
+      });
+    }
+    //create a new user if the email is non existent
     const user = new User({ email, password, username });
     await user.save();
+    //generate token for the new user
+    const token = createToken(user);
+    //save the newly created user and respond to the client with the token
     return res.status(200).json({
       success: true,
       message: `User with id - ${user.id} was created!`,
-      user
+      token
     });
   } catch (e) {
     return res.status(400).json({
       error: true,
       message: 'Error with updating user',
+      details: e
+    });
+  }
+};
+
+export const login = async (req, res) => {
+  const { email } = req.body;
+
+  try {
+    const user = await User.create({ email });
+    //return 201 for creation
+    return res.status(201).json({
+      success: true,
+      user,
+      token: `JWT ${createToken(user)}`
+    });
+  } catch (e) {
+    return res.status(e.status).json({
+      error: true,
+      message: "Something went wrong with user's auth",
       details: e
     });
   }
@@ -80,26 +112,6 @@ export const updateUser = async (req, res) => {
     return res.status(400).json({
       error: true,
       message: 'Error with updating user',
-      details: e
-    });
-  }
-};
-
-export const loginWithAuth0 = async (req, res) => {
-  const { email } = req.body;
-
-  try {
-    const user = await User.create({ email });
-    //return 201 for creation
-    return res.status(201).json({
-      success: true,
-      user,
-      token: `JWT ${createToken(user)}`
-    });
-  } catch (e) {
-    return res.status(e.status).json({
-      error: true,
-      message: "Something went wrong with user's auth",
       details: e
     });
   }

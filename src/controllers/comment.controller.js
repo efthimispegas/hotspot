@@ -1,7 +1,8 @@
 import { _Comment, Hotspot } from '../models';
 import { querySetup } from '../helpers/query.helpers';
-import { checkInput } from '../helpers/hotspot.helpers';
+import { checkInput, checkView } from '../helpers/hotspot.helpers';
 
+/* [Working as expected] */
 export const getHotspotComments = async (req, res) => {
   const { hotspotId } = req.params;
   try {
@@ -14,8 +15,7 @@ export const getHotspotComments = async (req, res) => {
     if (!foundHotspot) {
       return res.status(400).json({
         success: false,
-        message:
-          'Error with comments pagination method. Check whether the collection is empty'
+        message: 'Requested hotspot was not found, try checking hotspot ID!'
       });
     }
     const q = querySetup(req);
@@ -24,16 +24,26 @@ export const getHotspotComments = async (req, res) => {
       limit: q.limit,
       offset: q.offset,
       select: 'description created_at user',
-      sort: { create_at: -1 }
+      sort: { created_at: 1 } //latest comment at the bottom
     };
     //Execute a query on the comments collection and
     //paginate the returned docs with the options above
-    const docs = await _Comment.paginate(query, options);
+    const { docs, total, limit, offset } = await _Comment.paginate(
+      query,
+      options
+    );
+    const message =
+      total <= limit
+        ? `Fetched ${total} comments`
+        : `Successfull pagination. Fetched ${limit} out of ${total} comments`;
     return res.status(200).json({
       error: false,
-      message: `Successfull pagination. Fetched ${docs.total} comments`,
+      message,
       hotspot: foundHotspot._id,
-      comments: docs
+      comments: docs,
+      total,
+      limit,
+      offset
     });
   } catch (e) {
     return res.status(400).json({
@@ -44,6 +54,65 @@ export const getHotspotComments = async (req, res) => {
   }
 };
 
+/** [...Working on getting the Hotspot with its comments AND its views count] */
+export const _getHotspotComments = async (req, res) => {
+  //for now we get the user's id from the params but later we will change the endpoint
+  //so we need to figure out a different way to check the view
+  const { userId, hotspotId } = req.params;
+
+  try {
+    //Try to find to hotspot specified by the hotspotId
+    const foundHotspot = await Hotspot.findById(hotspotId);
+    // console.log('===============');
+    // console.log('[CommentController]:\n', foundHotspot);
+    // console.log('===============');
+    //If the hotspot doesn't exist, handle it
+    if (!foundHotspot) {
+      return res.status(400).json({
+        success: false,
+        message: 'Requested hotspot was not found, try checking hotspot ID!'
+      });
+    }
+    //we check if the user has previously viewed the hotspot
+    checkView(foundHotspot, userId);
+
+    const q = querySetup(req);
+    const query = { parent: hotspotId };
+    const options = {
+      limit: q.limit,
+      offset: q.offset,
+      select: 'description created_at user',
+      sort: { created_at: 1 } //latest comment at the bottom
+    };
+    //Execute a query on the comments collection and
+    //paginate the returned docs with the options above
+    const { docs, total, limit, offset } = await _Comment.paginate(
+      query,
+      options
+    );
+    const message =
+      total <= limit
+        ? `Fetched ${total} comments`
+        : `Successfull pagination. Fetched ${limit} out of ${total} comments`;
+    return res.status(200).json({
+      error: false,
+      message,
+      hotspot: foundHotspot._id,
+      comments: docs,
+      total,
+      limit,
+      offset
+    });
+  } catch (e) {
+    return res.status(400).json({
+      error: true,
+      message: `Error when fetching comments from hotspot with id - ${hotspotId}`,
+      details: e
+    });
+  }
+};
+
+/* [Working as expected] */
 export const createComment = async (req, res) => {
   const { hotspotId } = req.params;
 
@@ -74,6 +143,16 @@ export const createComment = async (req, res) => {
           details: err
         });
       }
+      foundHotspot.comments_count++;
+      foundHotspot.save(function(err) {
+        if (err) {
+          return res.status(400).json({
+            error: true,
+            message: "Error when trying to update the hotspot's comments count",
+            details: err
+          });
+        }
+      });
       //return 201 for creation
       return res.status(201).json({
         sucess: true,

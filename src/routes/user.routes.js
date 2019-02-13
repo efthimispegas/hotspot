@@ -1,7 +1,9 @@
 import mongo from 'mongodb';
 import { Router } from 'express';
+import passport from 'passport';
 
 import { UserController } from '../controllers';
+import { signupSchema, loginSchema, validateBody } from '../helpers';
 
 const UserRoutes = new Router();
 
@@ -14,8 +16,14 @@ UserRoutes.get('/users/:userId', UserController.getUser);
 UserRoutes.put('/users/:userId', UserController.updateUser);
 
 // ================= POST ==================== //
-UserRoutes.post('/users/auth0', UserController.loginWithAuth0);
 
-UserRoutes.post('/users', UserController.createUser);
+UserRoutes.post('/register', validateBody(signupSchema), UserController.signup);
+
+UserRoutes.post(
+  '/login',
+  validateBody(loginSchema),
+  passport.authenticate('jwt', { session: false }),
+  UserController.login
+);
 
 export default UserRoutes;

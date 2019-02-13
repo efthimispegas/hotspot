@@ -1,11 +1,6 @@
 import * as HotspotController from './hotspot.controller';
-import * as LocationController from './location.controller';
 import * as UserController from './user.controller';
 import * as CommentController from './comment.controller';
+import * as FileController from './file.controller';
 
-export {
-  HotspotController,
-  LocationController,
-  UserController,
-  CommentController
-};
+export { HotspotController, UserController, CommentController, FileController };

@@ -1,20 +1,18 @@
 import mongoose, { Schema } from 'mongoose';
 import mongoosePaginate from 'mongoose-paginate';
 
-const Hotspot = new Schema(
+const Object3D = new Schema(
   {
-    text: { type: String, required: true },
-    description: { type: String, required: true },
-    object: { type: Boolean, default: false },
+    text: { type: String },
+    description: { type: String },
+    object: { type: Boolean, default: true },
     loc: {
       coordinates: { type: Array, required: true },
       type: { type: String, required: true }
     },
-    city: { type: String },
-    country: { type: String },
     validity: { type: Number },
     valid: { type: Boolean, default: true },
-    file: { type: Object },
+    obj: { type: Object },
     views_count: { type: Number, default: 0 },
     comments_count: { type: Number, default: 0 },
     user: {
@@ -26,6 +24,6 @@ const Hotspot = new Schema(
   { collection: 'hotspots' }
 );
 
-Hotspot.plugin(mongoosePaginate);
+Object3D.plugin(mongoosePaginate);
 
-export default mongoose.model('Hotspot', Hotspot);
+export default mongoose.model('Object3D', Object3D);
