@@ -30,7 +30,15 @@ export default app => {
   });
   app.set('view engine', 'pug');
   app.set('views', path.join(__dirname, '../views'));
-
+  //cors configurations
+  app.use(function(req, res, next) {
+    res.set('Access-Control-Allow-Origin', '*');
+    res.set(
+      'Access-Control-Allow-Headers',
+      'Origin-X-Requested-With, Content-Type, Accept'
+    );
+    next();
+  });
   app.use(cookieParser());
   // uncomment after placing your favicon in /public
   //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
