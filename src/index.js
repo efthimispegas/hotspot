@@ -34,11 +34,11 @@ app.use('/api', [
  * Catch any errors and pass them to
  * the error handler
  */
-app.use((req, res, next) => {
-  const err = new Error('Not Found');
-  err.status = 404;
-  next(err);
-});
+// app.use((req, res, next) => {
+//   const err = new Error('Not Found');
+//   err.status = 404;
+//   next(err);
+// });
 
 /**
  * Error Handler
@@ -49,13 +49,12 @@ app.use((err, req, res, next) => {
 
   //respond to the client
   res.status(status).json({
-    error: {
-      message: error.message
-    }
+    message: 'There has been a connection error',
+    details: err //-> change it to "error" in prod
   });
 
   //respond to ourselves
-  console.error(err);
+  console.log(err);
 });
 
 /**

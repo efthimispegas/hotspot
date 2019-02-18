@@ -22,7 +22,10 @@ export default app => {
   });
   app.set('view engine', 'pug');
   app.set('views', path.join(__dirname, '../views'));
-  //cors configurations
+  app.use(cookieParser());
+  // uncomment after placing your favicon in /public
+  //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
+  //cors configurations go at the end (they modify body)
   app.use(function(req, res, next) {
     res.set('Access-Control-Allow-Origin', '*');
     res.set(
@@ -31,7 +34,4 @@ export default app => {
     );
     next();
   });
-  app.use(cookieParser());
-  // uncomment after placing your favicon in /public
-  //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 };

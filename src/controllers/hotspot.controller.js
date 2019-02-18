@@ -13,7 +13,7 @@ import config from '../config/config';
 export const createHotspot = async (req, res) => {
   try {
     console.log('===============');
-    console.log('[HotspotController] request.body received\n:', req.body);
+    console.log('[HotspotController] request.body received:\n', req.body);
     console.log('===============');
     const q = checkInput(req);
     let newHotspot = {};
@@ -24,24 +24,23 @@ export const createHotspot = async (req, res) => {
     }
 
     console.log('===============');
-    console.log('[HotspotController] hotspot created\n', newHotspot);
+    console.log('[HotspotController] new hotspot:\n', newHotspot);
     console.log('===============');
-
     await newHotspot.save(err => {
       if (err) {
         return res.status(400).json({
           success: false,
-          message: 'Error when trying to save hotspot!',
+          messsage: 'Error with saving hotspot, bad request.',
           details: err
         });
       }
     });
-    // console.log('===============');
-    // console.log('[HotspotController] hotspot saved\n');
-    // console.log('===============');
+    console.log('===============');
+    console.log('[HotspotController] hotspot saved\n');
+    console.log('===============');
     // return 201 for creation
     return res.status(201).json({
-      sucess: true,
+      success: true,
       message: `New hotspot with id - ${newHotspot._id} created successfully!`,
       hotspot: newHotspot
     });
@@ -135,6 +134,7 @@ export const getUserHotspots = async (req, res) => {
 };
 
 /** [Working on getting a user hotspots with comments and view/comment count] */
+//use it for the details screen
 export const _getUserHotspots = async (req, res) => {
   const { userId } = req.params;
   try {
@@ -238,9 +238,10 @@ export const _getUserHotspots = async (req, res) => {
 };
 
 /* [Is working as expected] */
+// use it for loading hotspots in homescreen
 export const getHotspotsWithinRadius = async (req, res) => {
   console.log('===============');
-  console.log('[HotspotControlla]:', req.query);
+  console.log('[HotspotControlla] hotspots within radius:', req.query);
   console.log('===============');
   if (
     !req.query.hasOwnProperty('lat') ||
@@ -269,7 +270,8 @@ export const getHotspotsWithinRadius = async (req, res) => {
   const options = {
     limit: q.limit,
     offset: q.offset,
-    select: 'description text loc user object validity valid created_at'
+    select:
+      'description text file loc user object validity valid views_count comments_count created_at'
   };
 
   try {

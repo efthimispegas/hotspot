@@ -27,8 +27,10 @@ export const getUser = async (req, res) => {
 };
 
 export const signup = async (req, res) => {
-  const { email, password, username } = req.body;
-
+  const { email, avatar } = req.body;
+  console.log('===============');
+  console.log('req.body:', req.body);
+  console.log('===============');
   try {
     //check if the user already exists
     const foundUser = await User.findOne({ email });
@@ -38,42 +40,101 @@ export const signup = async (req, res) => {
         message: 'Email is already in use'
       });
     }
-    //create a new user if the email is non existent
-    const user = new User({ email, password, username });
-    await user.save();
+
+    //create the new user
+    const user = new User({ ...req.body, avatar: { uri: avatar } });
+    await user.save(function(err) {
+      if (err) {
+        console.log(err);
+        throw new Error(err);
+      }
+    });
     //generate token for the new user
     const token = createToken(user);
     //save the newly created user and respond to the client with the token
     return res.status(200).json({
       success: true,
       message: `User with id - ${user.id} was created!`,
-      token
+      user,
+      token: `Bearer ${token}`
     });
   } catch (e) {
     return res.status(400).json({
       error: true,
-      message: 'Error with updating user',
-      details: e
+      message: 'Error with registering user',
+      details: e.message
     });
   }
 };
 
 export const login = async (req, res) => {
-  const { email } = req.body;
+  const { email, password } = req.body;
 
   try {
-    const user = await User.create({ email });
-    //return 201 for creation
-    return res.status(201).json({
+    const foundUser = await User.findOne({ email });
+    //if we don't find the user, handle it
+    if (!foundUser) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid credentials'
+      });
+    }
+    // if we found him, then create token and login
+    console.log('===============');
+    console.log('req.user:', req.user);
+    console.log('===============');
+    const token = createToken(foundUser);
+    return res.status(200).json({
       success: true,
-      user,
-      token: `JWT ${createToken(user)}`
+      user: foundUser,
+      token: `Bearer ${token}`
     });
   } catch (e) {
-    return res.status(e.status).json({
+    return res.status(400).json({
       error: true,
       message: "Something went wrong with user's auth",
       details: e
+    });
+  }
+};
+
+export const googleOAuth = async (req, res) => {
+  try {
+    // console.log('===============');
+    // console.log('[UserController]:', req.user);
+    // console.log('===============');
+
+    const token = createToken(req.user);
+    return res.status(201).json({
+      success: true,
+      message: 'User logged in successfully with googleOAuth',
+      token: `Bearer ${token}`
+    });
+  } catch (e) {
+    return res.status(400).json({
+      error: true,
+      message: 'Error with googleOAuth',
+      details: e.message
+    });
+  }
+};
+
+export const facebookOAuth = async (req, res) => {
+  try {
+    console.log('===============');
+    console.log('[UserController]:', req.user);
+    console.log('===============');
+    const token = createToken(req.user);
+    return res.status(201).json({
+      success: true,
+      message: 'User logged in successfully with facebookOAuth',
+      token: `Bearer ${token}`
+    });
+  } catch (e) {
+    return res.status(400).json({
+      error: true,
+      message: 'Error with facebookOAuth',
+      details: e.message
     });
   }
 };
@@ -98,7 +159,7 @@ export const updateUser = async (req, res) => {
       if (err) {
         return res.status(400).json({
           success: false,
-          messsage: `Error when trying to find and update user with id - ${userId}`,
+          messsage: `Error when trying and update user with id - ${userId}. Check the new values!`,
           details: err
         });
       }

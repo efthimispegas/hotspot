@@ -1,6 +1,7 @@
 import { _Comment, Hotspot } from '../models';
 import { querySetup } from '../helpers/query.helpers';
-import { checkInput, checkView } from '../helpers/hotspot.helpers';
+import { checkInput } from '../helpers/hotspot.helpers';
+import { checkView } from '../helpers';
 
 /* [Working as expected] */
 export const getHotspotComments = async (req, res) => {
@@ -63,9 +64,9 @@ export const _getHotspotComments = async (req, res) => {
   try {
     //Try to find to hotspot specified by the hotspotId
     const foundHotspot = await Hotspot.findById(hotspotId);
-    // console.log('===============');
-    // console.log('[CommentController]:\n', foundHotspot);
-    // console.log('===============');
+    console.log('===============');
+    console.log('[CommentController]:\n', foundHotspot);
+    console.log('===============');
     //If the hotspot doesn't exist, handle it
     if (!foundHotspot) {
       return res.status(400).json({

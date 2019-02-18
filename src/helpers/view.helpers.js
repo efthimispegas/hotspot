@@ -1,4 +1,4 @@
-import { View } from '../models';
+import { View, Hotspot } from '../models';
 
 export const setView = (hotspot_id, user_id) => {
   return new View({
