@@ -29,4 +29,17 @@ HotspotRoutes.get('/hotspots', HotspotController.getAllHotspots);
 /* POST Hotspot */
 HotspotRoutes.post('/hotspots/new', HotspotController.createHotspot);
 
+//============== PUT =================/
+
+/* EDIT a hotspot */
+HotspotRoutes.put(`/hotspots/:hotspotId/edit`, HotspotController.updateHotspot);
+
+//============== DELETE =================/
+
+/* DELETE a hotspot */
+HotspotRoutes.delete(
+  `/hotspots/:hotspotId/delete`,
+  HotspotController.removeHotspot
+);
+
 export default HotspotRoutes;

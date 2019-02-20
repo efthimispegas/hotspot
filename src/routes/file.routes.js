@@ -13,4 +13,7 @@ FileRoutes.get('/gallery', FileController.getGalleryFiles);
 
 FileRoutes.get('/users/:userId/gallery', FileController.getUserGallery);
 
+//================ DELETE ==================//
+FileRoutes.delete('/gallery/:fileId/delete', FileController.removeFile);
+
 export default FileRoutes;

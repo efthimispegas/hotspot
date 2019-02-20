@@ -137,3 +137,30 @@ export const userFileUpload = async (req, res) => {
     });
   }
 };
+
+export const removeFile = async (req, res) => {
+  const { fileId } = req.params;
+
+  try {
+    await File.findByIdAndRemove(fileId, function(err, result) {
+      if (err) {
+        return res.status(400).json({
+          success: false,
+          messsage: `Error when trying and delete file with id - ${fileId}!`,
+          details: err
+        });
+      }
+      return res.status(200).json({
+        success: true,
+        message: `File with id - ${fileId} was deleted!`,
+        file: result
+      });
+    });
+  } catch (e) {
+    return res.status(400).json({
+      error: true,
+      message: 'General error in removing hotspot',
+      details: e
+    });
+  }
+};

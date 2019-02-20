@@ -16,7 +16,7 @@ UserRoutes.get('/users/:userId', UserController.getUser);
 
 // ================= PUT ==================== //
 /* Update a User */
-UserRoutes.put('/users/:userId/update', UserController.updateUser);
+UserRoutes.put('/users/:userId/edit', UserController.updateUser);
 
 // ================= POST ==================== //
 

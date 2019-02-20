@@ -53,6 +53,80 @@ export const createHotspot = async (req, res) => {
   }
 };
 
+/** [Working as expected]  */
+export const updateHotspot = async (req, res) => {
+  const { hotspotId } = req.params;
+  const { text } = req.body;
+  console.log('===============');
+  console.log('[HotspotControlla] edit: \n', req.body);
+  console.log('===============');
+
+  const update = {
+    text,
+    description: text.length <= 150 ? text : text.substr(0, 150).concat('...')
+  };
+
+  const options = {
+    returnNewDocument: true,
+    new: true,
+    upsert: true,
+    runValidators: true
+  };
+  try {
+    await Hotspot.findByIdAndUpdate(hotspotId, update, options, function(
+      err,
+      result
+    ) {
+      if (err) {
+        return res.status(400).json({
+          success: false,
+          messsage: `Error when trying and update hotspot with id - ${hotspotId}. Check the new values!`,
+          details: err
+        });
+      }
+      return res.status(200).json({
+        success: true,
+        message: `Hotspot with id - ${hotspotId} was updated!`,
+        user: result
+      });
+    });
+  } catch (e) {
+    return res.status(400).json({
+      error: true,
+      message: 'Error with updating hotspot',
+      details: e
+    });
+  }
+};
+
+/** [Working as expected]  */
+export const removeHotspot = async (req, res) => {
+  const { hotspotId } = req.params;
+
+  try {
+    await Hotspot.findByIdAndRemove(hotspotId, function(err, result) {
+      if (err) {
+        return res.status(400).json({
+          success: false,
+          messsage: `Error when trying and delete hotspot with id - ${hotspotId}!`,
+          details: err
+        });
+      }
+      return res.status(200).json({
+        success: true,
+        message: `Hotspot with id - ${hotspotId} was deleted!`,
+        hotspot: result
+      });
+    });
+  } catch (e) {
+    return res.status(400).json({
+      error: true,
+      message: 'General error in removing hotspot',
+      details: e
+    });
+  }
+};
+
 /* [Is working as expected] */
 export const getHotspot = async (req, res) => {
   const { hotspotId } = req.params;
