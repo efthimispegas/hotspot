@@ -5,7 +5,7 @@ import GoogleStrategy from 'passport-google-plus-token';
 import FacebookStrategy from 'passport-facebook-token';
 
 import { User } from '../models';
-import config from '../config/config';
+import { apiKey } from '../config/apiKeys';
 
 /**
  * JWT Strategy
@@ -16,7 +16,7 @@ passport.use(
   new JWTStrategy(
     {
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken('authorization'),
-      secretOrKey: config.JWT_SECRET
+      secretOrKey: apiKey.jwt.JWT_SECRET
     },
     async (payload, done) => {
       try {
@@ -74,8 +74,8 @@ passport.use(
   'google',
   new GoogleStrategy(
     {
-      clientID: config.google.CLIENT_ID,
-      clientSecret: config.google.CLIENT_SECRET
+      clientID: apiKey.google.CLIENT_ID,
+      clientSecret: apiKey.google.CLIENT_SECRET
     },
     async (accessToken, refreshToken, profile, done) => {
       try {
@@ -118,8 +118,8 @@ passport.use(
   'facebook',
   new FacebookStrategy(
     {
-      clientID: config.facebook.CLIENT_ID,
-      clientSecret: config.facebook.CLIENT_SECRET
+      clientID: apiKey.facebook.CLIENT_ID,
+      clientSecret: apiKey.facebook.CLIENT_SECRET
     },
     async (accessToken, refreshToken, profile, done) => {
       console.log('===============');

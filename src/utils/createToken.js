@@ -1,6 +1,6 @@
 import jwt from 'jsonwebtoken';
 
-import config from '../config/config';
+import { apiKey } from '../config/apiKeys';
 
 export const createToken = args =>
   jwt.sign(
@@ -10,5 +10,5 @@ export const createToken = args =>
       iat: new Date().getTime(), //current time
       exp: new Date().setDate(new Date().getDate() + 1) //current time tomorrow
     },
-    config.JWT_SECRET
+    apiKey.jwt.JWT_SECRET
   );
