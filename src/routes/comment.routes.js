@@ -8,7 +8,7 @@ const base = '/:userId/hotspots/:hotspotId';
 //============ GET ================/
 
 /* GET Hotspot's comments -> will ultimately be the route for the message details page (comments, views etc) */
-CommentRoutes.get(`${base}/comments`, CommentController._getHotspotComments);
+CommentRoutes.get(`${base}/comments`, CommentController.getHotspotComments);
 
 //============== POST =================/
 

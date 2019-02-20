@@ -33,8 +33,11 @@ export const signupSchema = Joi.object().keys({
   username: Joi.string()
     .regex(/^(.*[a-zA-Z\d].{4,25})/)
     .required(),
-  country: Joi.string(),
-  city: Joi.string().required()
+  fullname: Joi.string(),
+  birthday: Joi.date(),
+  city: Joi.string().required(),
+  gender: Joi.string().required(),
+  avatar: Joi.string()
 });
 
 export const loginSchema = Joi.object().keys({

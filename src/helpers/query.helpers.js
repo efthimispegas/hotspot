@@ -1,14 +1,14 @@
 import mongo from 'mongodb';
 
 //max limit of the returned docs from the query
-const LIMIT = 10;
-const MAX_LIMIT = 50;
+const LIMIT = 100;
+const MAX_LIMIT = 10000;
 
 export const querySetup = req => {
   let limit = req.query.limit !== undefined ? parseInt(req.query.limit) : LIMIT;
   const page = req.query.page !== undefined ? parseInt(req.query.page) : 1;
   const offset = page ? limit * (page - 1) : 0;
-
+  
   if (limit > MAX_LIMIT) {
     limit = MAX_LIMIT;
   }

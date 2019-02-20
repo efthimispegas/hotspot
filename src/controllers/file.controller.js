@@ -7,74 +7,9 @@ import {
   processFile,
   objectLength,
   querySetup,
-  createId
+  createId,
+  isEmptyObject
 } from '../helpers';
-
-export const fileUpload = async (req, res) => {
-  let user_id = null;
-
-  if (objectLength(req.files) !== 2) {
-    return res.status(400).json({
-      error: true,
-      message: 'No files found for upload'
-    });
-  }
-  if (
-    !req.files.hasOwnProperty('thumb') ||
-    !req.files.hasOwnProperty('object')
-  ) {
-    return res.status(400).json({
-      error: true,
-      message: 'Incorrent files for upload'
-    });
-  }
-  if (
-    typeof req.body.user_id != 'undefined' &&
-    validator.isAlphanumeric(req.body.user_id)
-  ) {
-    user_id = req.body.user_id;
-  }
-
-  processFile(req.files.thumb)
-    .then(path => {
-      const thumb_file_path = path;
-      processFile(req.files.object)
-        .then(obj_file_path => {
-          const filename = checkFileName(req.body.filename);
-          const galleryFile = new File({
-            filename,
-            thumb_file_path,
-            obj_file_path,
-            uploaded_at: new Date(),
-            user_id
-          });
-          galleryFile.save(function(err) {
-            if (err) {
-              return res.status(400).json({
-                error: true,
-                message: 'Error while saving file',
-                details: err
-              });
-            }
-            return res.status(200).send();
-          });
-        })
-        .catch(error => {
-          return res.status(400).json({
-            error: true,
-            message: 'Error while processing object file',
-            details: error
-          });
-        });
-    })
-    .catch(error => {
-      return res.status(400).json({
-        error: true,
-        message: 'Error while processing thumb file',
-        details: error
-      });
-    });
-};
 
 export const getGalleryFiles = async (req, res) => {
   try {
@@ -114,8 +49,9 @@ export const getGalleryFiles = async (req, res) => {
   }
 };
 
+/** [Working as expected] */
 export const getUserGallery = async (req, res) => {
-  const userId = validator.escape(req.body.params);
+  const { userId } = req.params;
 
   try {
     const q = querySetup(req);
@@ -125,9 +61,9 @@ export const getUserGallery = async (req, res) => {
       offset: q.offset
     };
 
-    const foundFile = await File.paginate(query, options);
+    const { docs, limit, offset, total } = await File.paginate(query, options);
 
-    if (!foundFile) {
+    if (!docs) {
       return res.status(400).json({
         success: false,
         message: `Requested gallery from user - ${userId} not found`
@@ -136,7 +72,7 @@ export const getUserGallery = async (req, res) => {
     return res.status(200).json({
       success: true,
       message: `Succesfully fetched gallery from user - ${userId}`,
-      gallery: foundFile
+      gallery: docs
     });
   } catch (e) {
     return res.status(400).json({
@@ -146,6 +82,7 @@ export const getUserGallery = async (req, res) => {
   }
 };
 
+/** [Working as expected] */
 export const userFileUpload = async (req, res) => {
   if (isEmptyObject(req.body)) {
     return res.status(400).json({
@@ -154,29 +91,14 @@ export const userFileUpload = async (req, res) => {
     });
   }
 
-  const filename = Number.isFinite(req.body.filename)
-    ? req.body.filename
-    : validator.escape(req.body.filename);
-
-  const user_id = createId(req.body.user_id);
-
-  if (!user_id) {
-    return res.status(400).json({
-      error: true,
-      message: `Error with creating id for user - ${user_id}`,
-      details: e
-    });
+  const { user_id } = req.body;
+  let uri = null;
+  if (req.body.uri) {
+    uri = req.body.uri;
   }
-
   try {
-    checkFilePath(req.body.obj_file_path);
-    checkFilePath(req.body.thumb_file_path);
-
-    const { obj_file_path, thumb_file_path } = req.body;
-
     const foundFile = await File.findOne({
-      thumb_file_path,
-      obj_file_path,
+      uri,
       user_id
     });
     //if a file is found, handle it
@@ -185,14 +107,12 @@ export const userFileUpload = async (req, res) => {
         success: false,
         message: 'File already exists in your gallery',
         file: foundFile,
-        path: thumb_file_path
+        uri
       });
     }
     //if the file doesn't exist, add it to the gallery
     const galleryFile = new File({
-      filename,
-      obj_file_path,
-      thumb_file_path,
+      uri,
       user_id,
       uploaded_at: new Date()
     });
@@ -205,18 +125,12 @@ export const userFileUpload = async (req, res) => {
           details: err
         });
       }
-      return res.json(201).json({
-        error: false,
+      return res.status(201).json({
+        success: true,
         message: 'File added to your gallery'
       });
     });
   } catch (error) {
-    if (error.code === 'ENOENT') {
-      return res.status(400).json({
-        error: true,
-        message: 'Incorrect path'
-      });
-    }
     return res.status(400).json({
       error: true,
       message: error

@@ -1,33 +1,4 @@
 import mongoose, { Schema } from 'mongoose';
-<<<<<<< HEAD
-
-const Hotspot = new Schema(
-  {
-    title: {
-      type: String,
-      required: true
-    },
-    description: {
-      type: String,
-      required: true
-    },
-    hotspotDate: {
-      type: Date
-    },
-    location: {
-      type: Schema.Types.ObjectId,
-      ref: '_Location'
-    }
-  },
-  {
-    timestamps: true
-  },
-  {
-    usePushEach: true
-  }
-);
-
-=======
 import mongoosePaginate from 'mongoose-paginate';
 
 const Hotspot = new Schema(
@@ -57,5 +28,4 @@ const Hotspot = new Schema(
 
 Hotspot.plugin(mongoosePaginate);
 
->>>>>>> exp
 export default mongoose.model('Hotspot', Hotspot);
