@@ -14,7 +14,9 @@ const Hotspot = new Schema(
     country: { type: String },
     validity: { type: Number },
     valid: { type: Boolean, default: true },
-    file: { type: Object },
+    file: {
+      uri: { type: String, default: null }
+    },
     views_count: { type: Number, default: 0 },
     comments_count: { type: Number, default: 0 },
     user: {

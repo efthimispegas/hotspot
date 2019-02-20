@@ -1,17 +1,14 @@
-import { _Comment, Hotspot } from '../models';
+import { _Comment, Hotspot, User } from '../models';
 import { querySetup } from '../helpers/query.helpers';
 import { checkInput } from '../helpers/hotspot.helpers';
 import { checkView } from '../helpers';
 
-/* [Working as expected] */
-export const getHotspotComments = async (req, res) => {
+/* [Working as expected, deprecated] */
+export const __getHotspotComments__ = async (req, res) => {
   const { hotspotId } = req.params;
   try {
     //Try to find to hotspot specified by the hotspotId
     const foundHotspot = await Hotspot.findById(hotspotId);
-    console.log('===============');
-    console.log('[CommentController]:\n', foundHotspot);
-    console.log('===============');
     //If the hotspot doesn't exist, handle it
     if (!foundHotspot) {
       return res.status(400).json({
@@ -56,7 +53,7 @@ export const getHotspotComments = async (req, res) => {
 };
 
 /** [...Working on getting the Hotspot with its comments AND its views count] */
-export const _getHotspotComments = async (req, res) => {
+export const getHotspotComments = async (req, res) => {
   //for now we get the user's id from the params but later we will change the endpoint
   //so we need to figure out a different way to check the view
   const { userId, hotspotId } = req.params;
@@ -64,9 +61,6 @@ export const _getHotspotComments = async (req, res) => {
   try {
     //Try to find to hotspot specified by the hotspotId
     const foundHotspot = await Hotspot.findById(hotspotId);
-    console.log('===============');
-    console.log('[CommentController]:\n', foundHotspot);
-    console.log('===============');
     //If the hotspot doesn't exist, handle it
     if (!foundHotspot) {
       return res.status(400).json({
@@ -115,7 +109,7 @@ export const _getHotspotComments = async (req, res) => {
 
 /* [Working as expected] */
 export const createComment = async (req, res) => {
-  const { hotspotId } = req.params;
+  const { userId, hotspotId } = req.params;
 
   try {
     //try find a hotspot with the requested id
@@ -127,11 +121,27 @@ export const createComment = async (req, res) => {
         message: `Requested hotspot with id - ${hotspotId} was not found. Check whether the hotspot ID is valid.`
       });
     }
+    //try find a user with the requested id
+    const foundUser = await User.findById(userId);
+    //check if the user wasn't found, handle it
+    if (!foundUser) {
+      return res.status(400).json({
+        success: false,
+        message: `Requested user with id - ${userId} was not found. Check whether the user ID is valid.`
+      });
+    }
+    console.log('===============');
+    console.log('foundUser:', foundUser);
+    console.log('===============');
+    //if hotspot, user are valid, check input
     const q = checkInput(req);
     const newComment = new _Comment({
       parent: hotspotId,
       text: req.body.text,
-      user: req.body.user,
+      user: {
+        id: foundUser._id,
+        username: foundUser.username
+      },
       description: q.description,
       created_at: Date.now()
     });
@@ -144,7 +154,9 @@ export const createComment = async (req, res) => {
           details: err
         });
       }
+      //update this hotspot's comments_count
       foundHotspot.comments_count++;
+      //save the changes
       foundHotspot.save(function(err) {
         if (err) {
           return res.status(400).json({

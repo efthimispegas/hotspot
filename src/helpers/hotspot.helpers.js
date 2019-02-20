@@ -25,7 +25,9 @@ export const setMessage = (req, q) => {
     },
     validity: req.body.validity,
     user: req.body.user,
-    file: req.body.file,
+    file: {
+      uri: req.body.file.uri
+    },
     views_count: 0,
     comments_count: 0,
     created_at: Date.now()
