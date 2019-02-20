@@ -1,6 +1,5 @@
 const config = {
   DB_URL: 'mongodb://localhost:27017/hotspot',
-  JWT_SECRET: 'secret',
   RADIUS: 5, //in km
   EARTH_RADIUS: 6378.1,
   RADIUS_RATIO: 0.000783932,
