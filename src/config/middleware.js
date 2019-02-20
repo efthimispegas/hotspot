@@ -1,14 +1,6 @@
 import bodyParser from 'body-parser';
 import morgan from 'morgan';
 import passport from 'passport';
-<<<<<<< HEAD
-
-export default app => {
-  app.use(bodyParser.json());
-  app.use(bodyParser.urlencoded({ extended: false }));
-  app.use(morgan('dev'));
-  app.use(passport.initialize());
-=======
 import express from 'express';
 import path from 'path';
 import favicon from 'serve-favicon';
@@ -30,9 +22,16 @@ export default app => {
   });
   app.set('view engine', 'pug');
   app.set('views', path.join(__dirname, '../views'));
-
   app.use(cookieParser());
   // uncomment after placing your favicon in /public
   //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
->>>>>>> exp
+  //cors configurations go at the end (they modify body)
+  app.use(function(req, res, next) {
+    res.set('Access-Control-Allow-Origin', '*');
+    res.set(
+      'Access-Control-Allow-Headers',
+      'Origin-X-Requested-With, Content-Type, Accept'
+    );
+    next();
+  });
 };

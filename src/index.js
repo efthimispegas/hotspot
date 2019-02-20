@@ -4,8 +4,9 @@ import middlewareConfig from './config/middleware';
 import {
   DefaultRoutes,
   HotspotRoutes,
-  LocationRoutes,
-  UserRoutes
+  UserRoutes,
+  CommentRoutes,
+  FileRoutes
 } from './routes';
 import path from 'path';
 
@@ -21,7 +22,40 @@ dbConfig();
  */
 middlewareConfig(app);
 
-app.use('/api', [DefaultRoutes, HotspotRoutes, LocationRoutes, UserRoutes]);
+app.use('/api', [
+  DefaultRoutes,
+  HotspotRoutes,
+  UserRoutes,
+  CommentRoutes,
+  FileRoutes
+]);
+
+/**
+ * Catch any errors and pass them to
+ * the error handler
+ */
+// app.use((req, res, next) => {
+//   const err = new Error('Not Found');
+//   err.status = 404;
+//   next(err);
+// });
+
+/**
+ * Error Handler
+ */
+app.use((err, req, res, next) => {
+  const error = app.get('env') === 'development' ? err : {};
+  const status = err.status || 500;
+
+  //respond to the client
+  res.status(status).json({
+    message: 'There has been a connection error',
+    details: err //-> change it to "error" in prod
+  });
+
+  //respond to ourselves
+  console.log(err);
+});
 
 /**
  * Listening on PORT

@@ -1,39 +1,32 @@
 import { Router } from 'express';
 
 import { HotspotController } from '../controllers';
-import { requireJwtAuth } from '../utils/requireJwtAuth';
 
 const HotspotRoutes = new Router();
-const collectionName = 'hotspot';
 
-//GET requests
+//========= GET ============== //
 
-/* GET Hotspots */
-HotspotRoutes.get('/hotspots', function(req, res) {
-  const { db } = req;
-  const collection = db.get(collectionName);
-  collection.find({}, {}, function(e, docs) {
-    res.json(docs);
-  });
-});
-
-// HotspotRoutes.get(
-//   '/hotspots',
-//   // requireJwtAuth,
-//   HotspotController.getAllHotspots
-// );
-
+/* GET Hotspots within radius of 5km */
 HotspotRoutes.get(
-  '/hotspots/:hotspotId',
-  // requireJwtAuth,
-  HotspotController.getHotspot
+  '/hotspots/radius',
+  HotspotController.getHotspotsWithinRadius
 );
 
-//POST requests
+/* GET Hotspot by id */
+HotspotRoutes.get('/hotspots/:hotspotId', HotspotController.getHotspot);
 
-/* POST to Add User Service */
-HotspotRoutes.post('/hotspots', HotspotController.createHotspot);
+/* GET Hotspots by user id */
+HotspotRoutes.get(
+  '/users/:userId/hotspots',
+  HotspotController._getUserHotspots
+);
 
-// HotspotRoutes.post('/hotspots', HotspotController.createHotspot);
+/* GET all Hotspots */
+HotspotRoutes.get('/hotspots', HotspotController.getAllHotspots);
+
+//============= POST ===============//
+
+/* POST Hotspot */
+HotspotRoutes.post('/hotspots/new', HotspotController.createHotspot);
 
 export default HotspotRoutes;
