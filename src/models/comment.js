@@ -8,7 +8,10 @@ const _Comment = new Schema(
     parent: { type: String },
     user: {
       id: { type: String },
-      username: { type: String }
+      username: { type: String },
+      avatar: {
+        uri: { type: String }
+      }
     },
     created_at: { type: Date }
   },

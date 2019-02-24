@@ -47,14 +47,23 @@ passport.use(
     },
     async (email, password, done) => {
       try {
+        console.log('===============');
+        console.log('[Passport] user:', email, password);
+        console.log('===============');
         //find the user using the email
         const foundUser = await User.findOne({ email });
         //if the user is not found, handle it
+        console.log('===============');
+        console.log('[Passport] foundUser:', foundUser);
+        console.log('===============');
         if (!foundUser) {
           return done(null, false);
         }
         //check if the given password is correct
         const isMatch = await foundUser.isMatch(password);
+        console.log('===============');
+        console.log('[Passport] is match:', isMatch);
+        console.log('===============');
         if (!isMatch) {
           return done(null, false);
         }

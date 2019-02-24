@@ -19,7 +19,8 @@ const Hotspot = new Schema(
     comments_count: { type: Number, default: 0 },
     user: {
       id: { type: String },
-      username: { type: String }
+      username: { type: String },
+      avatar: { uri: { type: String } }
     },
     created_at: { type: Date }
   },

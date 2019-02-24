@@ -28,6 +28,8 @@ UserRoutes.post(
   UserController.login
 );
 
+UserRoutes.post('/verify', UserController.verifyAccessToken);
+
 UserRoutes.post(
   '/oauth/google',
   passport.authenticate('google', { session: false }),

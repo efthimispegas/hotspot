@@ -1,4 +1,4 @@
-import { User } from '../models';
+import { User, Hotspot } from '../models';
 import { createToken } from '../utils/createToken';
 
 export const getUser = async (req, res) => {
@@ -42,7 +42,11 @@ export const signup = async (req, res) => {
     }
 
     //create the new user
-    const user = new User({ ...req.body, avatar: { uri: avatar } });
+    const user = new User({
+      ...req.body,
+      avatar: { uri: avatar },
+      provider: 'local'
+    });
     await user.save(function(err) {
       if (err) {
         console.log(err);
@@ -51,11 +55,42 @@ export const signup = async (req, res) => {
     });
     //generate token for the new user
     const token = createToken(user);
+    //update the user with the token
+    const update = {
+      access_token: `Bearer ${token}`
+    };
+    const options = {
+      returnNewDocument: true,
+      new: true,
+      upsert: true,
+      runValidators: true
+    };
+    await User.findByIdAndUpdate(user._id, update, options, function(err, res) {
+      if (err) {
+        return res.status(400).json({
+          success: false,
+          messsage: `Error when trying and update user with id - ${
+            user._id
+          }. Check the new values!`,
+          details: err
+        });
+      }
+    });
     //save the newly created user and respond to the client with the token
     return res.status(200).json({
       success: true,
-      message: `User with id - ${user.id} was created!`,
-      user,
+      message: `User with id - ${user.id} signed up!`,
+      info: {
+        _id: user._id,
+        username: user.username,
+        fullname: user.fullname,
+        email: user.email,
+        city: user.city,
+        birthday: user.birthday,
+        gender: user.gender,
+        public: user.public,
+        avatar: user.avatar
+      },
       token: `Bearer ${token}`
     });
   } catch (e) {
@@ -74,25 +109,95 @@ export const login = async (req, res) => {
     const foundUser = await User.findOne({ email });
     //if we don't find the user, handle it
     if (!foundUser) {
-      return res.status(400).json({
+      return res.status(401).json({
         success: false,
         message: 'Invalid credentials'
       });
     }
     // if we found him, then create token and login
-    console.log('===============');
-    console.log('req.user:', req.user);
-    console.log('===============');
     const token = createToken(foundUser);
+    //update the user with the token
+    const update = {
+      access_token: `Bearer ${token}`
+    };
+    const options = {
+      returnNewDocument: true,
+      new: true,
+      upsert: true,
+      runValidators: true
+    };
+    await User.findByIdAndUpdate(foundUser._id, update, options, function(
+      err,
+      res
+    ) {
+      if (err) {
+        return res.status(400).json({
+          success: false,
+          messsage: `Error when trying and update user with id - ${
+            user._id
+          }. Check the new values!`,
+          details: err
+        });
+      }
+    });
     return res.status(200).json({
       success: true,
-      user: foundUser,
+      info: {
+        _id: foundUser._id,
+        email: foundUser.email,
+        username: foundUser.username,
+        fullname: foundUser.fullname,
+        gender: foundUser.gender,
+        public: foundUser.public,
+        city: foundUser.city,
+        birthday: foundUser.birthday,
+        avatar: foundUser.avatar
+      },
       token: `Bearer ${token}`
     });
   } catch (e) {
     return res.status(400).json({
       error: true,
       message: "Something went wrong with user's auth",
+      details: e
+    });
+  }
+};
+
+export const verifyAccessToken = async (req, res) => {
+  const { access_token } = req.body;
+
+  try {
+    const foundUser = await User.findOne({ access_token });
+    //if we don't find the user, handle it
+    if (!foundUser) {
+      return res.status(400).json({
+        success: false,
+        message: 'Verification failed, user not found'
+      });
+    }
+    // if we found him, then verify and redirect
+    console.log('===============');
+    console.log('[UserController] verify access token for user:', foundUser);
+    console.log('===============');
+    return res.status(200).json({
+      success: true,
+      info: {
+        _id: foundUser._id,
+        email: foundUser.email,
+        username: foundUser.username,
+        fullname: foundUser.fullname,
+        gender: foundUser.gender,
+        public: foundUser.public,
+        city: foundUser.city,
+        birthday: foundUser.birthday,
+        avatar: foundUser.avatar
+      }
+    });
+  } catch (e) {
+    return res.status(400).json({
+      error: true,
+      message: "Something went wrong with user's verification",
       details: e
     });
   }
@@ -152,27 +257,29 @@ export const updateUser = async (req, res) => {
     runValidators: true
   };
   try {
-    await User.findByIdAndUpdate(userId, update, options, function(
-      err,
-      result
-    ) {
-      if (err) {
-        return res.status(400).json({
-          success: false,
-          messsage: `Error when trying and update user with id - ${userId}. Check the new values!`,
-          details: err
-        });
+    const updatedUser = await User.findByIdAndUpdate(userId, update, options);
+    //hack for re-hashing new password
+    await updatedUser.save();
+    
+    return res.status(200).json({
+      success: true,
+      message: `User with id - ${userId} was updated!`,
+      info: {
+        _id: updatedUser._id,
+        email: updatedUser.email,
+        username: updatedUser.username,
+        fullname: updatedUser.fullname,
+        gender: updatedUser.gender,
+        public: updatedUser.public,
+        city: updatedUser.city,
+        birthday: updatedUser.birthday,
+        avatar: updatedUser.avatar
       }
-      return res.status(200).json({
-        success: true,
-        message: `User with id - ${userId} was updated!`,
-        user: result
-      });
     });
   } catch (e) {
-    return res.status(400).json({
+    return res.status(403).json({
       error: true,
-      message: 'Error with updating user',
+      message: 'Email already exists',
       details: e
     });
   }

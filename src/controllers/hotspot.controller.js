@@ -56,14 +56,16 @@ export const createHotspot = async (req, res) => {
 /** [Working as expected]  */
 export const updateHotspot = async (req, res) => {
   const { hotspotId } = req.params;
-  const { text } = req.body;
+  const { text, file, validity } = req.body;
   console.log('===============');
   console.log('[HotspotControlla] edit: \n', req.body);
   console.log('===============');
 
   const update = {
     text,
-    description: text.length <= 150 ? text : text.substr(0, 150).concat('...')
+    description: text.length <= 150 ? text : text.substr(0, 150).concat('...'),
+    file,
+    validity
   };
 
   const options = {
@@ -87,7 +89,7 @@ export const updateHotspot = async (req, res) => {
       return res.status(200).json({
         success: true,
         message: `Hotspot with id - ${hotspotId} was updated!`,
-        user: result
+        hotspot: result
       });
     });
   } catch (e) {
@@ -229,8 +231,6 @@ export const _getUserHotspots = async (req, res) => {
     const options = {
       limit: q.limit,
       offset: q.offset,
-      select:
-        'description text loc user object validity valid views_count created_at',
       sort: { created_at: 1 } //latest hotspot at the bottom
     };
     //Execute a query on the hotspots collection and
@@ -239,7 +239,9 @@ export const _getUserHotspots = async (req, res) => {
       query,
       options
     );
-
+    console.log('===============');
+    console.log('[HotspotController] found hotspots:', docs);
+    console.log('===============');
     let newDocs = [];
     const getCount = (entry, index, callback) => {
       const conditions = {
@@ -266,11 +268,18 @@ export const _getUserHotspots = async (req, res) => {
               console.log(err);
               throw new Error(err);
             }
-
+            console.log('===============');
+            console.log('entry:', entry);
+            console.log('===============');
             newDocs[index] = {};
             newDocs[index]._id = entry._id;
-            newDocs[index].created_at = entry.created_at;
+            newDocs[index].text = entry.text;
+            newDocs[index].description = entry.description;
+            newDocs[index].validity = entry.validity;
+            newDocs[index].valid = entry.valid;
             newDocs[index].loc = entry.loc;
+            newDocs[index].file = entry.file;
+            newDocs[index].created_at = entry.created_at;
             newDocs[index].views_count = entry.views_count;
             newDocs[index].comments_count = entry.comments_count;
             newDocs[index].new_comments_count = count;

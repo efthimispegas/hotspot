@@ -140,7 +140,8 @@ export const createComment = async (req, res) => {
       text: req.body.text,
       user: {
         id: foundUser._id,
-        username: foundUser.username
+        username: foundUser.username,
+        avatar: foundUser.avatar
       },
       description: q.description,
       created_at: Date.now()

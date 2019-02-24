@@ -11,8 +11,11 @@ const User = new Schema(
       username: { type: String },
       email: { type: String, unique: true },
       fullname: { type: String },
-      avatar: { type: String }
+      avatar: {
+        uri: { type: String }
+      }
     },
+    access_token: { type: String, unique: true },
     email: { type: String, unique: true },
     username: { type: String },
     password: { type: String },
