@@ -23,7 +23,7 @@ export const setMessage = (req, q) => {
       coordinates: [q.lat, q.lng],
       type: 'Point'
     },
-    validity: req.body.validity,
+    validity: new Date(Date.now() + req.body.validity * 60000), //the hotspot will be valid from now until now+validity*1min
     user: req.body.user,
     file: {
       uri: req.body.file.uri
@@ -43,7 +43,7 @@ export const setObject3D = (req, q) => {
       coordinates: [q.lat, q.lng],
       type: 'Point'
     },
-    validity: req.body.validity,
+    validity: new Date(Date.now() + req.body.validity * 60000),
     user: req.body.user,
     obj: req.body.obj,
     views_count: 0,

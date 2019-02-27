@@ -140,14 +140,21 @@ export const getHotspot = async (req, res) => {
         success: false,
         message: `Requested hotspot with id - ${hotspotId} does not exist!`
       });
+    } else {
+      if (!foundHotspot.valid) {
+        return res.status(400).json({
+          success: false,
+          message:
+            'You cannot write on this hotspot anymore because it has expired.'
+        });
+      }
+      //return 200 for success
+      return res.status(200).json({
+        success: true,
+        message: `Successfully fetched requested hotspot with id - ${hotspotId}`,
+        hotspot: foundHotspot
+      });
     }
-
-    //return 200 for success
-    return res.status(200).json({
-      success: true,
-      message: `Successfully fetched requested hotspot with id - ${hotspotId}`,
-      hotspot: foundHotspot
-    });
   } catch (e) {
     return res.status(e.status).json({
       error: true,
@@ -174,7 +181,7 @@ export const getUserHotspots = async (req, res) => {
       });
     }
     const q = querySetup(req);
-    const query = { 'user.id': userId, parent: null };
+    const query = { 'user.id': userId, parent: null, valid: true };
     const options = {
       limit: q.limit,
       offset: q.offset,
@@ -209,6 +216,36 @@ export const getUserHotspots = async (req, res) => {
   }
 };
 
+export const removeExpiredHotspots = async (req, res) => {
+  try {
+    const conditions = {
+      validity: { $lt: Date.now() }
+    };
+    const response = await Hotspot.remove(conditions, function(err) {
+      if (err) {
+        console.log('===============');
+        console.log('ERROR in deletion:', err);
+        console.log('===============');
+        throw err;
+      }
+    });
+
+    console.log('===============');
+    console.log('result of deleteMany:', response);
+    console.log('===============');
+    return res.status(200).json({
+      success: true,
+      message: 'Deleted hotspots that have expired',
+      response
+    });
+  } catch (error) {
+    return res.status(400).json({
+      error: true,
+      message: error
+    });
+  }
+};
+
 /** [Working on getting a user hotspots with comments and view/comment count] */
 //use it for the details screen
 export const _getUserHotspots = async (req, res) => {
@@ -227,11 +264,11 @@ export const _getUserHotspots = async (req, res) => {
       });
     }
     const q = querySetup(req);
-    const query = { 'user.id': userId, parent: null };
+    const query = { 'user.id': userId, parent: null, valid: true };
     const options = {
       limit: q.limit,
       offset: q.offset,
-      sort: { created_at: 1 } //latest hotspot at the bottom
+      sort: { created_at: -1 } //latest hotspot up top
     };
     //Execute a query on the hotspots collection and
     //paginate the returned docs with the options above
@@ -340,6 +377,7 @@ export const getHotspotsWithinRadius = async (req, res) => {
 
   const q = querySetup(req);
   const query = {
+    valid: true,
     parent: null,
     loc: {
       $geoWithin: {

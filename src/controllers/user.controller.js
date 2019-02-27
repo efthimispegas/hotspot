@@ -259,8 +259,9 @@ export const updateUser = async (req, res) => {
   try {
     const updatedUser = await User.findByIdAndUpdate(userId, update, options);
     //hack for re-hashing new password
+
     await updatedUser.save();
-    
+
     return res.status(200).json({
       success: true,
       message: `User with id - ${userId} was updated!`,

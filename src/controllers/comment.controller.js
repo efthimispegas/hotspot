@@ -68,6 +68,12 @@ export const getHotspotComments = async (req, res) => {
         message: 'Requested hotspot was not found, try checking hotspot ID!'
       });
     }
+    if (!foundHotspot.valid) {
+      return res.status(400).json({
+        message:
+          'You cannot comment on this hotspot anymore because it has expired.'
+      });
+    }
     //we check if the user has previously viewed the hotspot
     checkView(foundHotspot, userId);
 
@@ -119,6 +125,12 @@ export const createComment = async (req, res) => {
       return res.status(400).json({
         success: false,
         message: `Requested hotspot with id - ${hotspotId} was not found. Check whether the hotspot ID is valid.`
+      });
+    }
+    if (!foundHotspot.valid) {
+      return res.status(400).json({
+        message:
+          'You cannot comment on this hotspot anymore because it has expired.'
       });
     }
     //try find a user with the requested id

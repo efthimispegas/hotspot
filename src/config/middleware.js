@@ -6,6 +6,7 @@ import path from 'path';
 import favicon from 'serve-favicon';
 import cookieParser from 'cookie-parser';
 import monk from 'monk';
+import kue from 'kue';
 
 const db = monk('localhost:27017/hotspot');
 

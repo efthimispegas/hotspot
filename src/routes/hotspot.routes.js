@@ -1,6 +1,7 @@
 import { Router } from 'express';
 
 import { HotspotController } from '../controllers';
+import { Hotspot } from '../models';
 
 const HotspotRoutes = new Router();
 
@@ -40,6 +41,12 @@ HotspotRoutes.put(`/hotspots/:hotspotId/edit`, HotspotController.updateHotspot);
 HotspotRoutes.delete(
   `/hotspots/:hotspotId/delete`,
   HotspotController.removeHotspot
+);
+
+/* DELETE expired Hotspots */
+HotspotRoutes.delete(
+  '/hotspots/expired',
+  HotspotController.removeExpiredHotspots
 );
 
 export default HotspotRoutes;

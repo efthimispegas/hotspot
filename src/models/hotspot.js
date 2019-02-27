@@ -12,7 +12,7 @@ const Hotspot = new Schema(
     },
     city: { type: String },
     country: { type: String },
-    validity: { type: Number },
+    validity: { type: Date },
     valid: { type: Boolean, default: true },
     file: { type: Object },
     views_count: { type: Number, default: 0 },
