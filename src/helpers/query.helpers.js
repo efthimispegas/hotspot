@@ -1,7 +1,7 @@
 import mongo from 'mongodb';
 
 //max limit of the returned docs from the query
-const LIMIT = 5;
+const LIMIT = 7;
 const MAX_LIMIT = 100000;
 
 export const querySetup = req => {

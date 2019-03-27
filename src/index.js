@@ -6,7 +6,8 @@ import {
   HotspotRoutes,
   UserRoutes,
   CommentRoutes,
-  FileRoutes
+  FileRoutes,
+  StatsRoutes
 } from './routes';
 import path from 'path';
 
@@ -27,7 +28,8 @@ app.use('/api', [
   HotspotRoutes,
   UserRoutes,
   CommentRoutes,
-  FileRoutes
+  FileRoutes,
+  StatsRoutes
 ]);
 
 /**

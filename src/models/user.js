@@ -5,6 +5,7 @@ import mongoosePaginate from 'mongoose-paginate';
 
 const User = new Schema(
   {
+    //not used currently, but for future implementation they 're provided
     provider: { type: String, enum: ['local', 'google', 'facebook'] },
     providerData: {
       uid: { type: String },

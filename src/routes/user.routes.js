@@ -11,6 +11,7 @@ import PassportStrategies from '../utils/passportStrategies';
 const UserRoutes = new Router();
 
 // ================= GET ==================== //
+
 /* Get a User by id */
 UserRoutes.get('/users/:userId', UserController.getUser);
 
@@ -30,20 +31,22 @@ UserRoutes.post(
 
 UserRoutes.post('/verify', UserController.verifyAccessToken);
 
-UserRoutes.post(
+/********************************************** */
+/*                  Unused                      */
+UserRoutes.get(
   '/oauth/google',
   passport.authenticate('google', { session: false }),
   UserController.googleOAuth
 );
 
-UserRoutes.post(
+UserRoutes.get(
   '/oauth/facebook',
   passport.authenticate('facebook', { session: false }),
   UserController.facebookOAuth
 );
+/********************************************** */
 
 // test
-
 UserRoutes.get(
   '/secret',
   passport.authenticate('jwt', { session: false }),

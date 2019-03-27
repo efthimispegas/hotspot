@@ -78,7 +78,7 @@ passport.use(
 /**
  * Google Strategy
  */
-
+//future work, not used currently
 passport.use(
   'google',
   new GoogleStrategy(
@@ -122,7 +122,7 @@ passport.use(
 /**
  * Facebook Strategy
  */
-
+//future work, not used currently
 passport.use(
   'facebook',
   new FacebookStrategy(

@@ -16,10 +16,16 @@ HotspotRoutes.get(
 /* GET Hotspot by id */
 HotspotRoutes.get('/hotspots/:hotspotId', HotspotController.getHotspot);
 
-/* GET Hotspots by user id */
+/* GET Hotspots by user id (paginated) */
 HotspotRoutes.get(
   '/users/:userId/hotspots',
   HotspotController._getUserHotspots
+);
+
+/* GET all user hotspots */
+HotspotRoutes.get(
+  '/users/:userId/hotspots/all',
+  HotspotController.getAllUserHotspots
 );
 
 /* GET all Hotspots */

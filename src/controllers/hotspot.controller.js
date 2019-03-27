@@ -165,7 +165,7 @@ export const getHotspot = async (req, res) => {
 };
 
 /* [Is working as expected] */
-export const getUserHotspots = async (req, res) => {
+export const getAllUserHotspots = async (req, res) => {
   const { userId } = req.params;
   try {
     //Try to find to User specified by the userId
@@ -180,32 +180,17 @@ export const getUserHotspots = async (req, res) => {
         message: 'Requested User was not found, try checking user ID!'
       });
     }
-    const q = querySetup(req);
     const query = { 'user.id': userId, parent: null, valid: true };
     const options = {
-      limit: q.limit,
-      offset: q.offset,
-      select: 'description text loc user object validity valid created_at',
-      sort: { created_at: 1 } //latest hotspot at the bottom
+      limit: 10000
     };
     //Execute a query on the hotspots collection and
     //paginate the returned docs with the options above
-    const { docs, total, limit, offset } = await Hotspot.paginate(
-      query,
-      options
-    );
-    const message =
-      total <= limit
-        ? `Fetched ${total} hotspots`
-        : `Successfull pagination. Fetched ${limit} out of ${total} hotspots`;
+    const { docs } = await Hotspot.paginate(query, options);
     return res.status(200).json({
       error: false,
-      message,
-      user: foundUser._id,
-      hotspots: docs,
-      total,
-      limit,
-      offset
+      message: 'Request was successful',
+      myHotspots: docs
     });
   } catch (e) {
     return res.status(400).json({
@@ -425,38 +410,26 @@ export const getHotspotsWithinRadius = async (req, res) => {
 
 /* [Is working as expected] */
 export const getAllHotspots = async (req, res) => {
-  const q = querySetup(req);
-  const query = { parent: null };
-  const options = {
-    limit: q.limit,
-    offset: q.offset,
-    select: 'description text loc user object validity valid created_at'
-  };
-
   try {
     //Execute a query on the hotspots collection and
     //paginate the returned docs with the options above
-    const { docs, limit, total } = await Hotspot.paginate(query, options);
-    if (docs) {
-      const message =
-        total <= limit
-          ? `Fetched ${total} hotspots`
-          : `Successfull pagination. Fetched ${limit} out of ${total} hotspots`;
+    const hotspots = await Hotspot.find();
+    if (hotspots) {
       return res.status(200).json({
         error: false,
-        message,
-        hotspots: docs
+        message: 'Request was successfull',
+        hotspots
       });
     }
-    return res.status(400).json({
+    return res.status(200).json({
       success: false,
-      message:
-        'Error with hotspots pagination method. Check whether the collection is empty'
+      message: 'No hotspots found'
     });
   } catch (e) {
     return res.status(400).json({
       error: true,
-      message: e
+      message: 'Request failed',
+      details: e
     });
   }
 };
